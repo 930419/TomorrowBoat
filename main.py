@@ -1,4 +1,5 @@
 import os, discord, random, json
+from keep_alive import keep_alive
 
 intents = discord.Intents.default()
 intents.messages = True
