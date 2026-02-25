@@ -44,7 +44,10 @@ async def on_message(message):
             candidate_pool = sixstar["術師"] + sixstar["特種"]
             selected_sixstar = random.choice(candidate_pool)
         else:
-            selected_sixstar = random.choice(sixstar)
+            candidate_pool = []
+            for job_list in sixstar.values():
+                candidate_pool.extend(job_list)
+            selected_sixstar = random.choice(candidate_pool)
     
         await message.channel.send(
             f"抽取結果：\n"
