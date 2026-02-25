@@ -37,7 +37,7 @@ for team, jobs in TEAM_RULES.items():
 # -------------------------------
 # 抽卡核心邏輯，給 hybrid command 和 on_message 共用
 # -------------------------------
-async def do_ceo抽卡(channel,
+async def do_ceo(channel,
                      theme: Optional[str] = None,
                      team: Optional[str] = None,
                      operator: Optional[str] = None,
@@ -60,14 +60,11 @@ async def do_ceo抽卡(channel,
     else:
         if team:
             messages.append(f"博士，`{team}`並不存在於`{chosen_theme}`中哦！將進行隨機抽取")
-        if possible_teams:
-            chosen_team = random.choice(possible_teams)
-        else:
-            chosen_team = random.choice(list(TEAM_POOLS.keys()))
+        chosen_team = random.choice(possible_teams)
 
     # 幹員
     candidate_pool = TEAM_POOLS.get(chosen_team, ALL_OPERATORS)
-    if operator in candidate_pool:
+    if operator in ALL_OPERATORS:
         chosen_operator = operator
     else:
         if operator:
@@ -76,13 +73,13 @@ async def do_ceo抽卡(channel,
 
     # 結局
     possible_endings = ji[chosen_theme].get("結局", [])
-    chosen_ending = "未知結局"
+    chosen_ending = ""
     if possible_endings:
         if ending_number is not None:
             if 1 <= ending_number <= len(possible_endings):
                 chosen_ending = possible_endings[ending_number - 1]
             else:
-                messages.append(f"博士， `{chosen_theme}`中沒有`{ending_number}`哦！將進行隨機抽取")
+                messages.append(f"博士， `{chosen_theme}`中沒有`{ending_number}`結局哦！將進行隨機抽取")
                 chosen_ending = random.choice(possible_endings)
         else:
             chosen_ending = random.choice(possible_endings)
@@ -114,7 +111,7 @@ async def ceo(
     operator: Optional[str] = commands.parameter(description="幹員"),
     ending_number: Optional[int] = commands.parameter(description="結局編號（數字）")
 ):
-    await do_ceo抽卡(ctx, theme, team, operator, ending_number)
+    await do_ceo(ctx, theme, team, operator, ending_number)
 
 # -------------------------------
 # on_message 監聽訊息 (@機器人 集)
@@ -125,7 +122,7 @@ async def on_message(message):
         return
 
     if "集" in message.content and bot.user in message.mentions:
-        await do_ceo抽卡(message.channel)
+        await do_ceo(message.channel)
 
     await bot.process_commands(message)  # 不要忘了這行，否則 hybrid command 不會觸發
 
