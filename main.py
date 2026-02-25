@@ -1,3 +1,4 @@
+# ceo_bot_full.py
 import os, discord, random, json
 from discord.ext import commands
 from typing import Optional
@@ -33,22 +34,15 @@ for team, jobs in TEAM_RULES.items():
         pool.extend(sixstar[job])
     TEAM_POOLS[team] = pool
 
-@bot.hybrid_command(name="ceo", description="尊貴的羅德島CEO將協助您得償所願！（未選填將隨機抽選）")
-async def ceo(
-    ctx,
-    theme: Optional[str] = commands.parameter(
-        description="主題"
-    ),
-    team: Optional[str] = commands.parameter(
-        description="分隊"
-    ),
-    operator: Optional[str] = commands.parameter(
-        description="幹員"
-    ),
-    ending_number: Optional[int] = commands.parameter(
-        description="結局編號（數字）"
-    )
-):
+# -------------------------------
+# 抽卡核心邏輯，給 hybrid command 和 on_message 共用
+# -------------------------------
+async def do_ceo抽卡(channel,
+                     theme: Optional[str] = None,
+                     team: Optional[str] = None,
+                     operator: Optional[str] = None,
+                     ending_number: Optional[int] = None):
+
     messages = []
 
     # 主題
@@ -73,14 +67,14 @@ async def ceo(
 
     # 幹員
     candidate_pool = TEAM_POOLS.get(chosen_team, ALL_OPERATORS)
-    if operator in ALL_OPERATORS:
+    if operator in candidate_pool:
         chosen_operator = operator
     else:
         if operator:
             messages.append(f"博士，羅德島上並沒有幹員`{operator}`哦！將進行隨機抽取")
         chosen_operator = random.choice(candidate_pool)
 
-    # 結局（數字選）
+    # 結局
     possible_endings = ji[chosen_theme].get("結局", [])
     chosen_ending = "未知結局"
     if possible_endings:
@@ -93,12 +87,12 @@ async def ceo(
         else:
             chosen_ending = random.choice(possible_endings)
 
-    # 先把警告訊息發給使用者
+    # 發送警告訊息
     if messages:
-        await ctx.send("\n".join(messages))
+        await channel.send("\n".join(messages))
 
     # 發送抽取結果
-    await ctx.send(
+    await channel.send(
         f"抽取結果：\n"
         f"{chosen_theme}\n"
         f"{chosen_team}\n"
@@ -106,7 +100,38 @@ async def ceo(
         f"{chosen_ending}"
     )
 
+# -------------------------------
+# Hybrid command (/ceo)
+# -------------------------------
+@bot.hybrid_command(
+    name="ceo",
+    description="尊貴的羅德島CEO將協助您得償所願！（未選填將隨機抽選）"
+)
+async def ceo(
+    ctx,
+    theme: Optional[str] = commands.parameter(description="主題"),
+    team: Optional[str] = commands.parameter(description="分隊"),
+    operator: Optional[str] = commands.parameter(description="幹員"),
+    ending_number: Optional[int] = commands.parameter(description="結局編號（數字）")
+):
+    await do_ceo抽卡(ctx, theme, team, operator, ending_number)
+
+# -------------------------------
+# on_message 監聽訊息 (@機器人 集)
+# -------------------------------
+@bot.event
+async def on_message(message):
+    if message.author.bot:
+        return
+
+    if "集" in message.content and bot.user in message.mentions:
+        await do_ceo抽卡(message.channel)
+
+    await bot.process_commands(message)  # 不要忘了這行，否則 hybrid command 不會觸發
+
+# -------------------------------
 # 啟動 bot
+# -------------------------------
 try:
     token = os.getenv("TOKEN") or ""
     if token == "":
