@@ -43,7 +43,7 @@ async def on_message(message):
         elif team == "破壞戰術分隊":
             candidate_pool = sixstar["術師"] + sixstar["特種"]
             selected_sixstar = random.choice(candidate_pool)
-        else
+        else:
             selected_sixstar = random.choice(sixstar)
     
         await message.channel.send(
