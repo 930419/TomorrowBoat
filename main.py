@@ -84,7 +84,7 @@ async def do_ceo(interaction_or_channel,
     chosen_team = None
 
     if team:
-    team = team.strip()  # 去掉前後空白或不可見字符
+        team = team.strip()  # 去掉前後空白或不可見字符
 
     # 精準匹配
     filtered = [t for t, info in ji.items() if any(team == x.strip() for x in info.get("分隊", []))]
