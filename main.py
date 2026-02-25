@@ -90,12 +90,12 @@ async def do_ceo(interaction_or_channel,
             team = None
 
     # ---------- 主題抽取 ----------
-    if theme and theme in allowed_themes:
-        chosen_theme = theme
-    else:
-        if theme:
+    if theme == "random" or theme not in allowed_themes:
+        if theme != "random":
             messages.append(f"博士，`{theme}`不適用於指定分隊或不存在，將隨機抽取主題")
         chosen_theme = random.choice(allowed_themes)
+    else:
+        chosen_theme = theme
 
     # ---------- 分隊抽取 ----------
     possible_teams = ji[chosen_theme].get("分隊", [])
@@ -153,11 +153,12 @@ async def do_ceo(interaction_or_channel,
         Choice(name="探索者的銀凇止境", value="探索者的銀凇止境"),
         Choice(name="薩卡茲的無終奇語", value="薩卡茲的無終奇語"),
         Choice(name="歲的界園誌異", value="歲的界園誌異"),
+        Choice(name="隨機", value="random"),
     ]
 )
 async def ceo(
     interaction: discord.Interaction,
-    theme: Choice[str] = None,
+    theme: Choice[str],
     team: Optional[str] = None,
     operator: Optional[str] = None,
     ending_number: Optional[int] = None
