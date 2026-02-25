@@ -102,7 +102,7 @@ async def do_ceo(interaction_or_channel,
     if team and team in possible_teams:
         chosen_team = team
     else:
-        chosen_team = random.choice(possible_teams) if possible_teams
+        chosen_team = random.choice(possible_teams) if possible_teams else ""
         if team:
             messages.append(f"博士，`{team}`不適用於主題`{chosen_theme}`哦！將隨機抽取分隊")
 
