@@ -155,8 +155,14 @@ async def do_ceo(interaction_or_channel,
         Choice(name="歲的界園誌異", value="歲的界園誌異"),
     ]
 )
-async def ceo(interaction: discord.Interaction, theme: Choice[str], team: Optional[str] = None):
-    await do_ceo(interaction, theme.value, team=team)
+async def ceo(
+    interaction: discord.Interaction,
+    theme: Choice[str],
+    team: Optional[str] = None,
+    operator: Optional[str] = None,
+    ending_number: Optional[int] = None
+):
+    await do_ceo(interaction, theme.value, team=team, operator=operator, ending_number=ending_number)
 
 # -------------------------------
 # on_message 監聽訊息 (@機器人 集)
