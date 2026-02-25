@@ -50,7 +50,7 @@ async def do_ceo(channel,
         chosen_theme = theme
     else:
         if theme:
-            messages.append(f"博士，並沒有`{theme}`可以打哦!將進行隨機抽取")
+            messages.append(f"博士，並沒有`{theme}`可以打哦！將進行隨機抽取")
         chosen_theme = random.choice(list(ji.keys()))
 
     # 分隊
@@ -106,7 +106,10 @@ async def do_ceo(channel,
 )
 async def ceo(
     ctx,
-    theme: Optional[str] = commands.parameter(description="主題"),
+    theme: Optional[str] = commands.parameter(
+    description="選擇主題",
+    choices=["傀影與猩紅孤鑽", "水月與深藍之樹", "探索者的銀凇止境", "薩卡茲的無終奇語", "歲的界園誌異"]  # 這裡列出可選主題
+    )
     team: Optional[str] = commands.parameter(description="分隊"),
     operator: Optional[str] = commands.parameter(description="幹員"),
     ending_number: Optional[int] = commands.parameter(description="結局編號（數字）")
