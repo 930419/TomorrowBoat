@@ -31,8 +31,21 @@ async def on_message(message):
         # 抽結局
         ending = random.choice(ji[theme]["結局"])
         # 抽六星
-        selected_sixstar = random.choice(sixstar)
-
+        if team == "突擊戰術分隊":
+            candidate_pool = sixstar["先鋒"] + sixstar["近衛"]
+            selected_sixstar = random.choice(candidate_pool)
+        elif team == "堡壘戰術分隊":
+            candidate_pool = sixstar["重裝"] + sixstar["輔助"]
+            selected_sixstar = random.choice(candidate_pool)
+        elif team == "遠程戰術分隊":
+            candidate_pool = sixstar["狙擊"] + sixstar["醫療"]
+            selected_sixstar = random.choice(candidate_pool)
+        elif team == "破壞戰術分隊":
+            candidate_pool = sixstar["術師"] + sixstar["特種"]
+            selected_sixstar = random.choice(candidate_pool)
+        else
+            selected_sixstar = random.choice(sixstar)
+    
         await message.channel.send(
             f"抽取結果：\n"
             f"{theme}\n"
