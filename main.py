@@ -79,35 +79,39 @@ async def do_ceo(interaction_or_channel,
             await interaction_or_channel.send(msg)
         channel = interaction_or_channel
 
-# ---------- 檢查指定分隊是否存在（模糊匹配 + 簡寫） ----------
+    # ---------- 檢查指定分隊是否存在（精準 + 模糊 + 簡寫） ----------
     allowed_themes = list(ji.keys())
     chosen_team = None
 
     if team:
-        # 先嘗試精準匹配 JSON 裡的分隊名稱
-        filtered = [t for t, info in ji.items() if team in info.get("分隊", [])]
-        if not filtered:
-            # 模糊匹配：使用部分字串匹配
-            filtered = [t for t, info in ji.items() 
-                        if any(team in x or x in team for x in info.get("分隊", []))]
-        if not filtered:
-            # 嘗試簡寫對應，例如 "狙醫" -> "遠程戰術分隊"
-            abbrev_map = {
-                "狙醫": "遠程戰術分隊",
-                "近鋒": "突擊戰術分隊",
-                "重輔": "堡壘戰術分隊",
-                "術特": "破壞戰術分隊"
-            }
-            mapped = abbrev_map.get(team)
-            if mapped:
-                filtered = [t for t, info in ji.items() if mapped in info.get("分隊", [])]
+    team = team.strip()  # 去掉前後空白或不可見字符
 
-        if filtered:
-            allowed_themes = filtered
-            # 從 allowed_themes 中隨機選一個作為最後主題
-        else:
-            messages.append(f"博士，沒有任何主題包含分隊`{team}`哦! 將隨機抽取分隊")
-            team = None
+    # 精準匹配
+    filtered = [t for t, info in ji.items() if any(team == x.strip() for x in info.get("分隊", []))]
+
+    if not filtered:
+        # 模糊匹配（部分字串匹配）
+        filtered = [t for t, info in ji.items() if any(team in x.strip() or x.strip() in team for x in info.get("分隊", []))]
+
+    if not filtered:
+        # 簡寫對應
+        abbrev_map = {
+            "狙醫": "遠程戰術分隊",
+            "近鋒": "突擊戰術分隊",
+            "重輔": "堡壘戰術分隊",
+            "術特": "破壞戰術分隊",
+            "代理人": "代理人分隊"  # 加上你提到的簡寫
+        }
+        mapped = abbrev_map.get(team)
+        if mapped:
+            filtered = [t for t, info in ji.items() if mapped in info.get("分隊", [])]
+            team = mapped  # 直接把 team 改成完整名稱
+
+    if filtered:
+        allowed_themes = filtered
+    else:
+        messages.append(f"博士，沒有任何主題包含`{team}`哦! 將隨機抽取分隊")
+        team = None
 
     # ---------- 主題抽取 ----------
     if theme == "random" or theme not in allowed_themes:
@@ -124,7 +128,7 @@ async def do_ceo(interaction_or_channel,
     else:
         chosen_team = random.choice(possible_teams) if possible_teams else ""
         if team:
-            messages.append(f"博士，`{team}`不適用於主題`{chosen_theme}`哦！將隨機抽取分隊")
+            messages.append(f"博士，`{team}`不適用於`{chosen_theme}`哦！將隨機抽取分隊")
 
     # ---------- 幹員抽取 ----------
     candidate_pool = TEAM_POOLS.get(chosen_team, ALL_OPERATORS)
@@ -141,7 +145,7 @@ async def do_ceo(interaction_or_channel,
         if 1 <= ending_number <= len(possible_endings):
             chosen_ending = possible_endings[ending_number - 1]
         else:
-            messages.append(f"博士，主題`{chosen_theme}`中沒有`{ending_number}`哦！將隨機抽取結局")
+            messages.append(f"博士，`{chosen_theme}`中沒有結局`{ending_number}`哦！將隨機抽取結局")
             chosen_ending = random.choice(possible_endings) if possible_endings else ""
     else:
         chosen_ending = random.choice(possible_endings) if possible_endings else ""
@@ -153,10 +157,10 @@ async def do_ceo(interaction_or_channel,
     # 發送抽取結果
     await send(
         f"抽取結果：\n"
-        f"主題：{chosen_theme}\n"
-        f"分隊：{chosen_team}\n"
-        f"幹員：{chosen_operator}\n"
-        f"結局：{chosen_ending}"
+        f"{chosen_theme}\n"
+        f"{chosen_team}\n"
+        f"{chosen_operator}開\n"
+        f"{chosen_ending}"
     )
 
 # -------------------------------
