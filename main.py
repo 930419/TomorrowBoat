@@ -157,7 +157,7 @@ async def do_ceo(interaction_or_channel,
 )
 async def ceo(
     interaction: discord.Interaction,
-    theme: Choice[str],
+    theme: Choice[str] = None,
     team: Optional[str] = None,
     operator: Optional[str] = None,
     ending_number: Optional[int] = None
