@@ -127,6 +127,19 @@ async def on_message(message):
     await bot.process_commands(message)  # 不要忘了這行，否則 hybrid command 不會觸發
 
 # -------------------------------
+# on_ready 事件：登入成功後同步斜槓指令
+# -------------------------------
+@bot.event
+async def on_ready():
+    print(f"Logged in as {bot.user}")
+    try:
+        # 同步所有斜槓指令到 Discord
+        synced = await bot.tree.sync()
+        print(f"Synced {synced} commands")
+    except Exception as e:
+        print("同步指令時發生錯誤:", e)
+
+# -------------------------------
 # 啟動 bot
 # -------------------------------
 try:
