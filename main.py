@@ -113,7 +113,6 @@ async def do_ceo(interaction_or_channel,
                 "近鋒": "突擊戰術分隊",
                 "重輔": "堡壘戰術分隊",
                 "術特": "破壞戰術分隊",
-                "代理人": "代理人分隊"
             }
 
             mapped = abbrev_map.get(team)
@@ -131,7 +130,7 @@ async def do_ceo(interaction_or_channel,
             team = None
 
     # ---------- 主題 ----------
-    if theme == "random" or theme not in allowed_themes:
+    if theme is None or theme == "random" or theme not in allowed_themes:
         if theme != "random":
             messages.append(f"博士，`{theme}` 不存在或不適用，將隨機抽取主題")
         chosen_theme = random.choice(allowed_themes)
