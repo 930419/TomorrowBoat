@@ -131,7 +131,8 @@ async def do_ceo(interaction_or_channel,
 
     # ---------- 主題 ----------
     if theme is None or theme == "random" or theme not in allowed_themes:
-        if theme != "random":
+        # 只有 theme 非 None 且不為 random 才顯示訊息
+        if theme is not None and theme != "random" and theme not in allowed_themes:
             messages.append(f"博士，`{theme}` 不存在或不適用，將隨機抽取主題")
         chosen_theme = random.choice(allowed_themes)
     else:
